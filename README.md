@@ -2,6 +2,18 @@
 
 App that fetches a list of luxury homes from a mock API, stores them in a Room database, and displays them in a Jetpack Compose-based UI. The app should also include a "Favorite" feature, allowing users to mark a home as a favorite, which updates the local database.
 
+## App Assembly
+
+The application is built and assembled using the following configuration:
+
+- **Android Studio Version**: Koala | 2024.1.1 Patch 1  
+  Build #AI-241.18034.62.2411.12071903  
+- **Gradle Version**: 8.7  
+  Distribution URL: `https://services.gradle.org/distributions/gradle-8.7-bin.zip`
+
+Ensure that your development environment matches these specifications for smooth setup and assembly of the application.
+
+
 ## Features
 
 - **Property Listings**: Display a list of luxury properties with images and descriptions.
