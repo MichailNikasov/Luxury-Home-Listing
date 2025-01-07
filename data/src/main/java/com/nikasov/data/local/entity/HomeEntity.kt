@@ -11,5 +11,4 @@ data class HomeEntity(
     val price: Int,
     val imageUrl: String,
     val location: String,
-    val isFavorite: Boolean
 )

@@ -7,7 +7,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.nikasov.data.local.database.HomeDatabase
-import com.nikasov.data.local.entity.HomeEntity
+import com.nikasov.data.local.entity.HomeWithFavorite
 import com.nikasov.data.local.mapper.toHomeEntity
 import com.nikasov.domain.usecase.GetHomesUseCase
 import retrofit2.HttpException
@@ -16,11 +16,11 @@ import retrofit2.HttpException
 class HomeMediator(
     private val getHomesUseCase: GetHomesUseCase,
     private val homeDatabase: HomeDatabase,
-) : RemoteMediator<Int, HomeEntity>() {
+) : RemoteMediator<Int, HomeWithFavorite>() {
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, HomeEntity>
+        state: PagingState<Int, HomeWithFavorite>
     ): MediatorResult {
         return try {
             val loadKey = when (loadType) {
@@ -36,7 +36,7 @@ class HomeMediator(
 
                 LoadType.APPEND -> {
                     val lastPage = state.lastItemOrNull()
-                    lastPage?.id ?: 1
+                    lastPage?.home?.id ?: 1
                 }
             }
             return fetchHomes(loadKey, state.config.pageSize, loadType)
@@ -51,24 +51,13 @@ class HomeMediator(
             pageSize = pageSize
         ).getOrThrow()
         homeDatabase.withTransaction {
-            val updatedHomes = homes.map { home ->
-                val existingHome = homeDatabase.homeDao().getHomeById(home.id)
-                if (existingHome != null) {
-                    if (existingHome.isFavorite) {
-                        Log.i("fetchHomes", "fetchHomes: ${existingHome.id} is favorite")
-                    }
-                    home.copy(isFavorite = existingHome.isFavorite)
-                } else {
-                    home
-                }
-            }
             if (loadType == LoadType.REFRESH) {
                 homeDatabase.homeDao().clearHomes()
             }
-            val homeEntityList = updatedHomes.map { it.toHomeEntity() }
+            val homeEntityList = homes.map { it.toHomeEntity() }
             homeDatabase.homeDao().upsertHomes(homeEntityList)
         }
-        return MediatorResult.Success(endOfPaginationReached = homes.isEmpty())
+        return MediatorResult.Success(endOfPaginationReached = homes.size < pageSize)
     }
 
 }

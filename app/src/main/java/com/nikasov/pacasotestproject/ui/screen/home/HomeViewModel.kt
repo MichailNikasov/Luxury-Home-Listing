@@ -5,10 +5,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.nikasov.data.local.entity.HomeEntity
+import com.nikasov.data.local.entity.HomeWithFavorite
 import com.nikasov.data.local.mapper.toHome
 import com.nikasov.domain.manager.AppSettings
-import com.nikasov.domain.usecase.ClearHomeListUseCase
 import com.nikasov.domain.usecase.ToggleFavoriteHomeUseCase
 import com.nikasov.pacasotestproject.ui.widget.mapper.toHomeItemData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,15 +19,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    homePager: Pager<Int, HomeEntity>,
+    homePager: Pager<Int, HomeWithFavorite>,
     private val toggleFavoriteHomeUseCase: ToggleFavoriteHomeUseCase,
     private val appSettings: AppSettings,
-    private val clearHomeListUseCase: ClearHomeListUseCase
 ) : ViewModel() {
 
     val homeItems = homePager
         .flow
-        .map { it.map { homeEntity -> homeEntity.toHome().toHomeItemData() } }
+        .map {
+            it.map { homeEntity ->
+                homeEntity.home.toHome(homeEntity.favorite != null).toHomeItemData()
+            }
+        }
         .cachedIn(viewModelScope)
 
     val showError = appSettings.isShowError.stateIn(viewModelScope, SharingStarted.Eagerly, false)
@@ -42,12 +44,6 @@ class HomeViewModel @Inject constructor(
     fun toggleShowError() {
         viewModelScope.launch {
             appSettings.toggleShowError()
-        }
-    }
-
-    fun clearList() {
-        viewModelScope.launch {
-            clearHomeListUseCase()
         }
     }
 

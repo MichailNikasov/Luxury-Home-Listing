@@ -5,8 +5,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.nikasov.data.local.entity.HomeEntity
-
+import com.nikasov.data.local.entity.HomeWithFavorite
 
 @Dao
 interface HomeDao {
@@ -14,19 +15,11 @@ interface HomeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertHomes(homes: List<HomeEntity>)
 
-    @Query("SELECT * FROM homes WHERE id = :id")
-    suspend fun getHomeById(id: Int): HomeEntity?
-
     @Query("DELETE FROM homes")
     suspend fun clearHomes()
 
+    @Transaction
     @Query("SELECT * FROM homes")
-    fun getHomes(): PagingSource<Int, HomeEntity>
-
-    @Query("SELECT * FROM homes WHERE isFavorite = 1")
-    fun getFavoriteHomes(): PagingSource<Int, HomeEntity>
-
-    @Query("UPDATE homes SET isFavorite = NOT isFavorite WHERE id = :homeId")
-    suspend fun toggleFavorite(homeId: Int)
+    fun getHomesWithFavorites(): PagingSource<Int, HomeWithFavorite>
 
 }

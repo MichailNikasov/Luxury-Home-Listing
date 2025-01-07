@@ -1,7 +1,9 @@
 package com.nikasov.data.remote.repository
 
 import android.util.Log
+import com.nikasov.data.local.dao.FavoriteDao
 import com.nikasov.data.local.dao.HomeDao
+import com.nikasov.data.local.entity.FavoriteHomeEntity
 import com.nikasov.data.remote.api.NetworkApi
 import com.nikasov.data.remote.mapper.toPost
 import com.nikasov.domain.entity.Home
@@ -11,7 +13,8 @@ import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(
     private val networkApi: NetworkApi,
-    private val homeDao: HomeDao
+    private val homeDao: HomeDao,
+    private val favoriteDao: FavoriteDao,
 ) : HomeRepository {
     override suspend fun getHomes(start: Int, pageSize: Int): Result<List<Home>> {
         return try {
@@ -33,7 +36,11 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleFavorite(homeId: Int) {
-        homeDao.toggleFavorite(homeId)
+        if (favoriteDao.isFavorite(homeId)) {
+            favoriteDao.removeFavoriteById(homeId)
+        } else {
+            favoriteDao.addFavorite(FavoriteHomeEntity(homeId))
+        }
     }
 
 }

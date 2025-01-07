@@ -3,7 +3,7 @@ package com.nikasov.data.local.mapper
 import com.nikasov.data.local.entity.HomeEntity
 import com.nikasov.domain.entity.Home
 
-fun HomeEntity.toHome(): Home {
+fun HomeEntity.toHome(isFavorite: Boolean): Home {
     return Home(
         id = id,
         name = name,
@@ -21,6 +21,5 @@ fun Home.toHomeEntity(): HomeEntity {
         price = price,
         imageUrl = imageUrl,
         location = location,
-        isFavorite = isFavorite
     )
 }

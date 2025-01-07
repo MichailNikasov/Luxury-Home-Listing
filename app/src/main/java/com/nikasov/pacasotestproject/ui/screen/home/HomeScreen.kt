@@ -19,10 +19,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +48,9 @@ fun HomeScreen(
         if (homes.loadState.refresh is LoadState.Error) {
             snackbarHostState.showSnackbar((homes.loadState.refresh as LoadState.Error).error.toString())
         }
+        if (homes.loadState.append is LoadState.Error) {
+            snackbarHostState.showSnackbar((homes.loadState.append as LoadState.Error).error.toString())
+        }
     }
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -57,7 +58,6 @@ fun HomeScreen(
             AppTopBar(
                 showError = showError,
                 onShowError = { eventHandler(HomeScreenEvent.ToggleShowError) },
-                onClear = { eventHandler(HomeScreenEvent.ClearList) }
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -122,7 +122,6 @@ private fun HomeList(
 private fun AppTopBar(
     showError: Boolean,
     onShowError: () -> Unit,
-    onClear: () -> Unit,
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -144,22 +143,6 @@ private fun AppTopBar(
                     onShowError()
                 })
                 Spacer(modifier = Modifier.width(4.dp))
-                VerticalDivider(
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 20.dp),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                TextButton(onClick = {
-                    onClear()
-                }) {
-                    Text(
-                        text = "Clear",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
             }
         }
     )

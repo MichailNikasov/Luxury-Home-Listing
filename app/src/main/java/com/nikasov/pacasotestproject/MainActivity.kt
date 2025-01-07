@@ -31,7 +31,6 @@ class MainActivity : ComponentActivity() {
                         when (event) {
                             is HomeScreenEvent.ToggleFavorite -> homeViewModel.toggleFavorite(event.homeId)
                             HomeScreenEvent.ToggleShowError -> homeViewModel.toggleShowError()
-                            HomeScreenEvent.ClearList -> homeViewModel.clearList()
                         }
                     }
                 )
